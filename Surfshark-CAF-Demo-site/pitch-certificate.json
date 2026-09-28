@@ -1,0 +1,241 @@
+{
+ "percent": 96,
+ "words": 518,
+ "chars": 3374,
+ "typedFrom": "2026-09-28",
+ "typedTo": "2026-09-28",
+ "input": "built-in keyboard only",
+ "pubKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEs97QF9dTko2GJoGhjboN6o4q9xpk68IgQKkfkDmXLFdwXWQasSKoaEUtAJAfsao8MUEu+9BXy3/AUNgy44p2yQ==",
+ "issuedAt": "2026-09-28T09:16:20Z",
+ "typedChars": 2890,
+ "v": 1,
+ "wordsHash": "252719b5b0d66e0389281ab212fca60efe02e4fe30eed1cc08b0d81ecf4f45d0",
+ "editedChars": 180,
+ "passages": [
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "aaa39f6148b567d636ddda4880695517"
+  },
+  {
+   "v": "typed",
+   "h": "0571529f34734cdf48b1ac5f7ece6250",
+   "n": 12
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "92d0ab41b189437e0d26fa07632bed69"
+  },
+  {
+   "n": 12,
+   "h": "e56b95ef96a2681f1b3e038be4269aab",
+   "v": "typed"
+  },
+  {
+   "v": "typed",
+   "h": "f78f6fd330249fd7db6d31494205df5b",
+   "n": 12
+  },
+  {
+   "h": "b3f62d4d8b3ce6f4d48032d4c678e192",
+   "v": "typed",
+   "n": 12
+  },
+  {
+   "n": 12,
+   "v": "edited",
+   "h": "41c3ce45f8d81315c3874b5d77ca23c7"
+  },
+  {
+   "h": "566ec7cdcbfb7d5436dfdb20837d171c",
+   "n": 12,
+   "v": "typed"
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "5b4da60a8d5f3db8933ebed3c36c292d"
+  },
+  {
+   "h": "84f38761cb9c07af5ab09b42b7a72d47",
+   "n": 12,
+   "v": "typed"
+  },
+  {
+   "h": "7a676a57bb0daaec67b96468eb02b14d",
+   "n": 12,
+   "v": "typed"
+  },
+  {
+   "v": "typed",
+   "n": 12,
+   "h": "8ee6338c9f3c4c30bda04a3fed25b09c"
+  },
+  {
+   "v": "typed",
+   "h": "673211116bf8acb30e51f1056f5be7ed",
+   "n": 12
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "1cdec13da53b315ef980f9d4ec63aec8"
+  },
+  {
+   "h": "0d6eab99c4eca47c396e1b3ae65f945e",
+   "n": 12,
+   "v": "typed"
+  },
+  {
+   "v": "typed",
+   "n": 12,
+   "h": "6154c5ce8a39d86cfec146cca7921498"
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "9fdb6950c5b6a50e53113ed3de56eeb1"
+  },
+  {
+   "v": "typed",
+   "n": 12,
+   "h": "36e02ceb711b9630abf316740cd9d830"
+  },
+  {
+   "h": "d6985a4aaf94037d4ef0b7f63e176299",
+   "n": 12,
+   "v": "typed"
+  },
+  {
+   "h": "6bba76f39c6156568b5e0283f58bd67d",
+   "v": "edited",
+   "n": 12
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "5bae46de37739cd8b416a09b12333e9a"
+  },
+  {
+   "v": "typed",
+   "h": "46644090a88507a9c4df99f7e9069b60",
+   "n": 12
+  },
+  {
+   "v": "typed",
+   "h": "1178e2d6ad4112a64561c043be2eb482",
+   "n": 12
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "cd348ca3ea796faabbf8eb3706b2a626"
+  },
+  {
+   "v": "typed",
+   "h": "167a6a25a90365c572f8a63de231f31e",
+   "n": 12
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "8eb6ef3b3248bbf903a59ee0327ce93f"
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "b6d78d9db07bc63f61566865771fa256"
+  },
+  {
+   "n": 12,
+   "h": "aac84be7f5fe74dbf24f10a09b8a2dcd",
+   "v": "typed"
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "38b000d836e1a413e17053f49421f3c7"
+  },
+  {
+   "h": "befd1023d1035582b4e9f0f6035e328a",
+   "n": 12,
+   "v": "typed"
+  },
+  {
+   "v": "edited",
+   "n": 12,
+   "h": "69ccf16af7922b448bb0f785357eead6"
+  },
+  {
+   "h": "a26bfe120c601daf3f98a2a70d27f40a",
+   "v": "typed",
+   "n": 12
+  },
+  {
+   "h": "46fd5580139510fd43f49925b5f1436d",
+   "v": "typed",
+   "n": 12
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "b4d27103ba0eb9223f416dd76c3fa493"
+  },
+  {
+   "n": 12,
+   "h": "85efa42fe3895d9abb595f5dcb002d43",
+   "v": "typed"
+  },
+  {
+   "h": "ab2da4e163b73fda06ac734fc82ae9cf",
+   "n": 12,
+   "v": "typed"
+  },
+  {
+   "v": "typed",
+   "h": "646748268e03e868380af738bd60f3c2",
+   "n": 12
+  },
+  {
+   "n": 12,
+   "v": "untyped",
+   "h": "c8e3acd980dc846a4b7a60ff473ae6b0"
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "46949b66280709a2b84b0bbbfe672523"
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "a19fa0c7c6822c848b76778f8c7f4dac"
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "b25e2ddfd42ec3a16c2228cbaa606546"
+  },
+  {
+   "n": 12,
+   "h": "eacc1cf125d712116401d5e64c4cf674",
+   "v": "typed"
+  },
+  {
+   "n": 12,
+   "h": "7aef8a69b1fc607a2a6f22e7d0ba5574",
+   "v": "typed"
+  },
+  {
+   "v": "typed",
+   "n": 2,
+   "h": "29bc5ab9055ba2986b4f50f9648bb3e7"
+  }
+ ],
+ "claim": "demo-signing",
+ "exactHash": "d899a0f005c25d38b2a3b2f4eff9d25630701f5835bbc5904e1cb3ac0af9d54a",
+ "sip": true,
+ "externalKeyboard": false,
+ "sig": "MEQCIEAozmqPVCl8OC8vXrmUX8VBpx+IBphld1lCTu5mWi0RAiA1QAo1EUKbPL3j9C25M4AgGoNyUth+AfsWdy7wmC3MQQ=="
+}
