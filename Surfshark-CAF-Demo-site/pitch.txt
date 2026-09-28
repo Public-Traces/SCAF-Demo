@@ -1,10 +1,42 @@
+Dear Surfshark Team,
+
+We’re reaching out as two Marshall Scholars at Oxford University to apply for the Surfshark Cybersecurity Advocacy Fund. Below is our pitch. Thank you for your consideration!
+
+The cybersecurity need:
+
 The internet's content and traffic are now AI-led. In 2024, automated traffic overtook human traffic for the first time, reaching about 51% of all web traffic, with malicious bots making up roughly a third. For decades, we have operated on an assumption that sophisticated behavior on the internet has, by default, a person's intent behind it. As AI lowered the cost and accessibility of generating content, the unit economics have shifted the internet towards a cesspool of unauthored — and increasingly unauthorized — creation and consumption. Attackers now exploit this assumption at scale: phishing, social engineering, sock-puppet influence operations, fake reviews, and account fraud all depend on synthetic activity passing as human.
 
 The internet cannot reach its full potential if the human effort that underpins it becomes indistinguishable from automation. Today's leading response, AI watermarking, asks AI to label itself, a safeguard bad actors will simply skip. We bet the future of web security lies in transparency in the other direction: assuring humanity, not detecting artifice. Security teams have long recognized that allowlisting what is trusted outperforms blocklisting every threat. Proof of humanity applies the same logic, placing the burden on the honest party to prove rather than on defenders to guess.
 
-Our proposal is to scale a novel verifiable tool for humans to demonstrate that their words were physically typed. Authentication proves who a user is, and signatures prove data hasn't been tampered with. Our tool adds the missing layer: a certificate of human origin that travels with the text. With the privacy-preserving tool downloaded on participating desktops, proofs are generated passively, with no extra effort from the writer, and verification works seamlessly across writing environments. Our tool can (1) certify that text was physically typed by a human, (2) verify that certification wherever the text appears online, and (3) attribute it to its author. Attribution stays in the author's control: they can choose to link the text to a verified identity or remain an anonymous-but-verified human. Because a tool that observes typing must itself be secure, typing signals are processed on-device, raw keystrokes never leave the machine, and attestations are cryptographically signed. The system is designed to resist spoofing by software-injected keystrokes and hardware typing emulators.
+Our idea:
 
-Unlike AI detection tools, we let humans constructively prove their human involvement with digital actions, and enable that proof to travel alongside their actions across the digital world. Our proposal stands to make the human web more transparent, more distinct, and more resilient.
+We propose a novel cryptographic verification tool for humans to demonstrate that their own words were physically typed. Our tool adds a certificate of human origin that travels with text written on desktops. With the privacy-preserving tool downloaded on participating desktops, proofs are generated passively, with no extra effort from the writer, and verification works seamlessly across writing environments. Our tool can (1) certify that text was physically typed by a human, (2) verify that certification wherever the text appears online, and (3) attribute it to its author. Attribution stays in the author's control: they can choose to link the text to a verified identity or remain an anonymous-but-verified human. Because a tool that observes typing must itself be secure, typing signals are processed on-device, raw keystrokes never leave the machine, and attestations are cryptographically signed. The system is designed to resist spoofing by software-injected keystrokes and hardware typing emulators.
+
+Unlike AI detection tools, we let humans constructively prove their human involvement with digital actions and enable that proof to travel alongside their actions across the digital world. Our proposal stands to make the human web more transparent, more distinct, and more resilient.
+
 In doing so, we also seek to raise the cost of passing off artificial content as human. In our vision, everyone on the open web benefits: writers seeking recognition, teachers seeking assurance of student authorship to determine capability, platforms fighting coordinated bot campaigns, security teams defending against AI-generated phishing, and hiring managers screening a flood of synthetic applications.
 
+How users will experience it: 
+
+Writers download a desktop app and use it how they normally do. Signatures travel with the text in their native format, across the open Web. Users can optionally attach a verification link. Readers of content, keen to understand if text was indeed typed or artificially generated, can go to a verifier site to check the text. Think of it as the inverse of Claude’s new detection tool.
+
+Rather than just tell you how users experience it, we want to show you! You can copy paste this whole email into our demo to prove we physically typed out this pitch:
+
+https://public-traces.github.io/SCAF-Demo/Surfshark-CAF-Demo-site/
+
+What kind of support we need:
+
+We’re looking for funding from Surfshark to improve the tool’s security, privacy, and reach. We’ve been testing internally for months, but are keen to use Surfshark's resources and platform to make this tool ready and available for use across the wider Web.
+
 The next generation of web security won't only ask whether a user is authorized. It will ask whether a human is present at all. We believe proof of human authorship is a prerequisite, not an afterthought, for a safer and more genuine internet.
+
+About us:
+
+Pratyush Seshadri is a 2025 Marshall Scholar pursuing an MPhil in Economics at the University of Oxford, where he is a research fellow with the Oxford AI Governance Initiative and the Future Impacts Group. Prior to this, he was an energy investor at Blackstone, and worked on climate-resilient infrastructure alongside the United Nations. Pratyush holds a B.S. in Mathematics and Economics from UNC Chapel Hill, where he was a Morehead-Cain Scholar and a United States Presidential Scholar.
+
+Ben Fischer is a 2025 Marshall Scholar pursuing a DPhil in technology governance at the Oxford School of Government and Oxford Internet Institute. He is a former founder of Lighthouse, a VC-backed communication tool, and worked in the office of the CEO at Palantir. Ben has also worked on strategy and product at C3.ai and Turing. Ben holds an MSc in Cybersecurity, Privacy and Trust from the University of Edinburgh and a B.S. in Product Design from Stanford.
+
+Thank you again for your consideration. We look forward to hearing from you!
+
+With gratitude,
+Ben Fischer and Pratyush Seshadri

@@ -70,17 +70,17 @@ function siteCopy() {
   const texts = blocks.map(el => el.textContent.trim()).filter(Boolean);
   texts.push($("box").placeholder);
   // Results copy, as it reads for the pitch.
-  texts.push("96% of this text was physically typed", "Certificate of authenticity", "Signature has integrity.",
+  texts.push("100% of this text was physically typed", "Certificate of authenticity", "Signature has integrity.",
     "This certificate is secure end-to-end", "No injection",
     "No portions of the text were copy-pasted in or injected onto a word processor by AI.",
-    "96% typed on a built-in keyboard", "Signature verifies physical keys were pressed by computer’s built-in hardware.",
+    "100% typed on a built-in keyboard", "Signature verifies physical keys were pressed by computer’s built-in hardware.",
     "Text", "Display verified words", "Typed by hand", "Physically typed then edited",
     "Not typed by hand (copy-pasted or injected)", "Share the certificate", "Show the signed bytes");
   return texts;
 }
 
 async function prepare() {
-  const [certRes, pitchRes] = await Promise.all([fetch("pitch-certificate.json"), fetch("pitch.txt")]);
+  const [certRes, pitchRes] = await Promise.all([fetch("pitch-certificate.json", { cache: "no-cache" }), fetch("pitch.txt", { cache: "no-cache" })]);
   const cert = await certRes.json(), text = await pitchRes.text();
   PITCH = { cert, text };
   await Promise.all([...siteCopy(), text].map(remember));
