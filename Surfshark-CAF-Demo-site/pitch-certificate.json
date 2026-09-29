@@ -1,14 +1,14 @@
 {
  "v": 1,
  "claim": "demo-signing",
- "issuedAt": "2026-09-28T13:03:06Z",
+ "issuedAt": "2026-09-29T06:15:41Z",
  "pubKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEs97QF9dTko2GJoGhjboN6o4q9xpk68IgQKkfkDmXLFdwXWQasSKoaEUtAJAfsao8MUEu+9BXy3/AUNgy44p2yQ==",
- "words": 883,
- "chars": 5559,
- "wordsHash": "5305c015a1346cdfb0ab27f5803d36fb391934c6e36f1965e220204b1f58714a",
- "exactHash": "ceabaa531b837fe15598094ac714ee8041d91d7ad88675b0ecd55118fddcb750",
+ "words": 895,
+ "chars": 5625,
+ "wordsHash": "e394fd650f93a7e20a27bfc39fff8c463bda97cc34a3bdbeb806c44bfc8d9e96",
+ "exactHash": "e23a94345a18c0abe5dc3fe267036de85ac47f428473b461fecef0698f5c53db",
  "percent": 100,
- "typedChars": 5559,
+ "typedChars": 5625,
  "editedChars": 0,
  "passages": [
   {
@@ -224,42 +224,47 @@
   {
    "n": 12,
    "v": "typed",
-   "h": "c609823ee09fa3f2d9ba2643630da652"
+   "h": "a3912a116f248c20f5909df036c2aa4d"
   },
   {
    "n": 12,
    "v": "typed",
-   "h": "ee2c7b1ac005af7f81623b6322c14ecd"
+   "h": "409aa2f99d4219ef8f072fe130211106"
   },
   {
    "n": 12,
    "v": "typed",
-   "h": "b4d0f819fbaf865d7154dbdf34d2ebf8"
+   "h": "8a9faa8ffaa3ac51cdd360f800411af9"
   },
   {
    "n": 12,
    "v": "typed",
-   "h": "a241d13b9f473d9dda77c04d16c7eb1c"
+   "h": "c177c8ff42f97836496a7a0deee30936"
   },
   {
    "n": 12,
    "v": "typed",
-   "h": "4bdfaa3ed7afff1723fee9b747a2bcd3"
+   "h": "51422c213e01fe2f89851ee9d2764dd2"
   },
   {
    "n": 12,
    "v": "typed",
-   "h": "b8ca9f3d312b8d198e4cc832c1b14beb"
+   "h": "96ac26d1d1acb0d8d2deec9772cf0196"
   },
   {
    "n": 12,
    "v": "typed",
-   "h": "2e50431de27ef56312136a5cc531fc97"
+   "h": "0daa4d3f487af233b7bea0687588285f"
   },
   {
    "n": 12,
    "v": "typed",
-   "h": "3ff3ed3e42709d1bd8346f5baf130a7c"
+   "h": "d2272129a23439e2c31bf7caeb04a3ef"
+  },
+  {
+   "n": 12,
+   "v": "typed",
+   "h": "75cce705bbd60263999983b72e55ebc8"
   },
   {
    "n": 12,
@@ -383,9 +388,9 @@
   }
  ],
  "typedFrom": "2026-09-28",
- "typedTo": "2026-09-28",
+ "typedTo": "2026-09-29",
  "input": "built-in keyboard only",
  "sip": true,
  "externalKeyboard": false,
- "sig": "MEYCIQDpgW68hwHVWJWZuTY9Pns5wWU1eKgTCHmmPaoGZV+oCQIhAM2yKqGCmuEcaMLdpmPpOytaDJPY93nDzawWraBDAGuE"
+ "sig": "MEUCIGHXwROQ3lQ2K3QafZdjVpGbwcYKQRro4kgLdBlygSTPAiEAo0L6nwDWY1CoP2+m279i6tUN+/52m8Sidzz8S31z9so="
 }

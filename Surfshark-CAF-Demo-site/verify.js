@@ -70,7 +70,7 @@ function siteCopy() {
   const texts = blocks.map(el => el.textContent.trim()).filter(Boolean);
   texts.push($("box").placeholder);
   // Results copy, as it reads for the pitch.
-  texts.push("100% of this text was physically typed", "Certificate of authenticity", "Signature has integrity.",
+  texts.push("100% of this text was physically typed", "0% of this text was physically typed with our tool installed", "Certificate of authenticity", "Signature has integrity.",
     "This certificate is secure end-to-end", "No injection",
     "No portions of the text were copy-pasted in or injected onto a word processor by AI.",
     "100% typed on a built-in keyboard", "Signature verifies physical keys were pressed by computer’s built-in hardware.",
@@ -235,10 +235,12 @@ async function check() {
 
   $("markIcon").className = "mark" + (pct >= 90 ? "" : " bad");
   $("markIcon").innerHTML = pct >= 90 ? ICON.ok : ICON.bad;
-  $("headline").textContent = `${pct}% of this text was physically typed`;
+  $("headline").textContent = pct === 0 ? "0% of this text was physically typed with our tool installed"
+                                          : `${pct}% of this text was physically typed`;
   $("checked").innerHTML = paint(text, r.toks, r.label);
-  $("subline").hidden = pct > 0;
-  $("subline").textContent = hint ? `${lead} ${hint}` : lead;
+  // At 0% the headline says it all. Someone who typed without demo signing still gets the nudge.
+  $("subline").hidden = !(pct === 0 && hint);
+  $("subline").textContent = hint;
   $("certPane").hidden = pct === 0;
 
   const items = [

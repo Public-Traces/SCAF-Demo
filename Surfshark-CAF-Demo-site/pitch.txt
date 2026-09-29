@@ -18,9 +18,9 @@ In doing so, we also seek to raise the cost of passing off artificial content as
 
 How users will experience it: 
 
-Writers download a desktop app and use it how they normally do. Signatures travel with the text in their native format, across the open Web. Users can optionally attach a verification link. Readers of content, keen to understand if text was indeed typed or artificially generated, can go to a verifier site to check the text. Think of it as the inverse of Claude’s new detection tool.
+Writers download a desktop app and deploy it in the background of their normal computer usage. Signatures travel with the text in their native format, across the open Web. Users can optionally attach a verification link. Readers of content, keen to understand if text was indeed typed or artificially generated, can go to a verifier site to check the text. Think of it as the inverse of Claude’s new detection tool.
 
-Rather than just tell you how users experience it, we want to show you! You can copy paste this whole email into our demo to prove we physically typed out this pitch:
+Rather than just tell you how users experience it, we want to show you! You can copy paste this whole email into our demo to prove we physically typed out this pitch, as well as try it out for yourself:
 
 https://public-traces.github.io/SCAF-Demo/Surfshark-CAF-Demo-site/
 
@@ -31,7 +31,6 @@ We’re looking for funding from Surfshark to improve the tool’s security, pri
 The next generation of web security won't only ask whether a user is authorized. It will ask whether a human is present at all. We believe proof of human authorship is a prerequisite, not an afterthought, for a safer and more genuine internet.
 
 About us:
-
 Pratyush Seshadri is a 2025 Marshall Scholar pursuing an MPhil in Economics at the University of Oxford, where he is a research fellow with the Oxford AI Governance Initiative and the Future Impacts Group. Prior to this, he was an energy investor at Blackstone, and worked on climate-resilient infrastructure alongside the United Nations. Pratyush holds a B.S. in Mathematics and Economics from UNC Chapel Hill, where he was a Morehead-Cain Scholar and a United States Presidential Scholar.
 
 Ben Fischer is a 2025 Marshall Scholar pursuing a DPhil in technology governance at the Oxford School of Government and Oxford Internet Institute. He is a former founder of Lighthouse, a VC-backed communication tool, and worked in the office of the CEO at Palantir. Ben has also worked on strategy and product at C3.ai and Turing. Ben holds an MSc in Cybersecurity, Privacy and Trust from the University of Edinburgh and a B.S. in Product Design from Stanford.
