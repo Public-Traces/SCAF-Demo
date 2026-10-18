@@ -144,20 +144,32 @@ async function carry(raw, rawMarks) {
   const msg = enc.encode(`dsig1|${day}|${hex(bitmap)}|${toks.map(t => t.w).join(" ")}`);
   const sig = new Uint8Array(await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, KEY.privateKey, msg));
   const pub = new Uint8Array(await crypto.subtle.exportKey("raw", KEY.publicKey));
-  const bytes = [0x53, 0x47, 1, ...pub, day >>> 24 & 255, day >>> 16 & 255, day >>> 8 & 255, day & 255,
+  const bytes = [0x53, 0x47, 2, ...pub, day >>> 24 & 255, day >>> 16 & 255, day >>> 8 & 255, day & 255,
                  toks.length >> 8, toks.length & 255, ...bitmap, ...sig];
-  const hidden = bytes.map(v => String.fromCodePoint(v < 16 ? 0xFE00 + v : 0xE0100 + v - 16)).join("");
-  const i = raw.search(/\S/), w = String.fromCodePoint(raw.codePointAt(i)).length;
+  // Version 2 uses only the sixteen common variation selectors, two per byte. They're the ones emoji
+  // depend on, so design tools and editors keep them where they may drop rarer invisible characters.
+  const hidden = bytes.map(v => String.fromCharCode(0xFE00 + (v >> 4), 0xFE00 + (v & 15))).join("");
+  let i = raw.search(/[\p{L}\p{N}]/u);
+  if (i < 0) i = raw.search(/\S/);
+  const w = String.fromCodePoint(raw.codePointAt(i)).length;
   return raw.slice(0, i + w) + hidden + raw.slice(i + w);
 }
 function readCarried(str) {
-  const bytes = [];
+  const wide = [], nibbles = [];
   for (const ch of str) {
     const cp = ch.codePointAt(0);
-    if (cp >= 0xFE00 && cp <= 0xFE0F) bytes.push(cp - 0xFE00);
-    else if (cp >= 0xE0100 && cp <= 0xE01EF) bytes.push(cp - 0xE0100 + 16);
+    if (cp >= 0xFE00 && cp <= 0xFE0F) { wide.push(cp - 0xFE00); nibbles.push(cp - 0xFE00); }
+    else if (cp >= 0xE0100 && cp <= 0xE01EF) wide.push(cp - 0xE0100 + 16);
   }
-  if (bytes.length < 138 || bytes[0] !== 0x53 || bytes[1] !== 0x47 || bytes[2] !== 1) return null;
+  // Version 1 wrote one invisible character per byte, using rarer selectors as well; version 2 writes
+  // two common ones per byte. A copy in either format still verifies.
+  let bytes = wide;
+  if (wide.length === nibbles.length) {
+    if (nibbles.length % 2) return null;
+    bytes = [];
+    for (let i = 0; i < nibbles.length; i += 2) bytes.push(nibbles[i] << 4 | nibbles[i + 1]);
+  }
+  if (bytes.length < 138 || bytes[0] !== 0x53 || bytes[1] !== 0x47 || (bytes[2] !== 1 && bytes[2] !== 2)) return null;
   const n = bytes[72] << 8 | bytes[73], len = Math.ceil(n / 8);
   if (bytes.length !== 74 + len + 64) return null;
   return { pub: new Uint8Array(bytes.slice(3, 68)), day: (bytes[68] << 24 | bytes[69] << 16 | bytes[70] << 8 | bytes[71]) >>> 0,
@@ -190,7 +202,8 @@ function schedulePresign() {
 function copyWithSignature(e) {
   const s = box.selectionStart, t = box.selectionEnd;
   if (s === t) return;
-  if (e.type === "copy" && presigned && presigned.value === box.value && s === 0 && t === box.value.length) {
+  const v = box.value, whole = s <= v.length - v.trimStart().length && t >= v.trimEnd().length;
+  if (e.type === "copy" && presigned && presigned.value === v && whole) {
     e.clipboardData.setData("text/plain", presigned.text);
     e.preventDefault();
     return;
