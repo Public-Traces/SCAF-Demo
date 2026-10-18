@@ -102,7 +102,6 @@ const ready = prepare();
 let signing = false, marks = [], before = "", pastedDays = [], pending = Promise.resolve();
 const box = $("box");
 const isSigned = m => m.length > 0 && m.every(c => c === "k" || c === "e" || c === "c");
-const isTypedHere = m => m.length > 0 && m.every(c => c === "k" || c === "e");
 
 box.addEventListener("input", e => {
   let now = box.value;
@@ -129,28 +128,8 @@ box.addEventListener("input", e => {
   schedulePresign();
 });
 
-/* What this browser has seen typed with demo signing on, kept as fingerprints, the way the desktop
-   tool keeps them on a laptop. Text typed here still verifies after a trip through another app. */
-const MEMORY_KEY = "scaf-demo-typed";
-const MEMORY = new Map();
-try { for (const [h, d] of JSON.parse(localStorage.getItem(MEMORY_KEY) || "[]")) MEMORY.set(h, d); } catch (e) {}
-async function rememberTyped() {
-  const text = box.value, snap = marks.slice(), runs = [];
-  let run = [];
-  for (const t of words(text)) {
-    if (isTypedHere(snap.slice(t.s, t.e))) run.push(t.w);
-    else if (run.length) { runs.push(run); run = []; }
-  }
-  if (run.length) runs.push(run);
-  if (!runs.length) return;
-  const day = localDay();
-  for (const r of runs) {
-    const keys = r.length < GRAM ? ["s|" + r.join(" ")]
-               : r.slice(0, r.length - GRAM + 1).map((_, i) => "g|" + r.slice(i, i + GRAM).join(" "));
-    for (const k of keys) { const h = await sha(k); if (!MEMORY.has(h)) MEMORY.set(h, day); }
-  }
-  try { localStorage.setItem(MEMORY_KEY, JSON.stringify([...MEMORY].slice(-8000))); } catch (e) {}
-}
+// Earlier versions remembered signed typing in the browser. That's gone; clear what they stored.
+try { localStorage.removeItem("scaf-demo-typed"); } catch (e) {}
 
 /* The signature that travels with copied text: which words were signed, when, and by which key,
    written as invisible characters just after the first visible one. */
@@ -206,13 +185,11 @@ function schedulePresign() {
   presignTimer = setTimeout(async () => {
     const value = box.value, text = await carry(value, marks.slice());
     presigned = text && box.value === value ? { value, text } : null;
-    rememberTyped();
   }, 120);
 }
 function copyWithSignature(e) {
   const s = box.selectionStart, t = box.selectionEnd;
   if (s === t) return;
-  rememberTyped();
   if (e.type === "copy" && presigned && presigned.value === box.value && s === 0 && t === box.value.length) {
     e.clipboardData.setData("text/plain", presigned.text);
     e.preventDefault();
@@ -254,12 +231,6 @@ async function analyse(text) {
   grams.forEach((h, i) => { if (REG.grams.has(h)) for (let k = i; k < i + GRAM; k++) { label[k] = "t"; from.add("site"); } });
   if (toks.length && toks.length < GRAM && REG.whole.has(await sha("s|" + toks.map(t => t.w).join(" "))))
     toks.forEach((_, k) => { label[k] = "t"; from.add("site"); });
-  const boxDays = [];
-  grams.forEach((h, i) => { if (MEMORY.has(h)) { for (let k = i; k < i + GRAM; k++) if (label[k] === "u") label[k] = "t"; from.add("box"); boxDays.push(MEMORY.get(h)); } });
-  if (toks.length && toks.length < GRAM) {
-    const h = await sha("s|" + toks.map(t => t.w).join(" "));
-    if (MEMORY.has(h)) { toks.forEach((_, k) => { if (label[k] === "u") label[k] = "t"; }); from.add("box"); boxDays.push(MEMORY.get(h)); }
-  }
   toks.forEach((t, k) => {
     if (label[k] !== "u") return;
     const m = marks.slice(t.s, t.e);
@@ -268,7 +239,7 @@ async function analyse(text) {
       from.add("box");
     }
   });
-  return { toks, label, wordsHash, pitch: false, from, boxDays };
+  return { toks, label, wordsHash, pitch: false, from };
 }
 
 /* Every character takes the verdict of the word it belongs to; punctuation and spaces follow it. */
@@ -331,7 +302,6 @@ let CURRENT = null;
 async function check() {
   await ready;
   await pending;
-  rememberTyped();
   const text = $("box").value;
   if (!text.trim()) { $("box").focus(); return; }
   const r = await analyse(text);
@@ -349,7 +319,7 @@ async function check() {
     if (pct === 100 && good < total) pct = 99;
     const days = [];
     if (r.from.has("site")) days.push(SITE_WRITTEN);
-    if (r.from.has("box")) days.push(localDay(), ...r.boxDays, ...pastedDays);
+    if (r.from.has("box")) days.push(localDay(), ...pastedDays);
     cert = await signNew({
       v: 1, claim: "demo-signing", issuedAt: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
       originallyTyped: days.sort()[0] || "", percent: pct,
