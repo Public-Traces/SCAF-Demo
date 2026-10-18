@@ -11,6 +11,9 @@ Three things verify, and nothing else does:
 1. Every sentence on this site.
 2. The pitch (`pitch.txt`), which carries a certificate signed with the demo key (`pitch-certificate.json`).
 3. Text a visitor types by hand into the Demo box while demo signing is switched on.
+4. Text certified by the desktop app on a real Mac and published in `certificates.json`. Each certificate is
+   signed by a key held in that Mac's security chip, and carries a fingerprint of every four typed words, so
+   any copy of the text verifies and a changed word shows up on its own.
 
 Text pasted in from anywhere else is marked as not typed by hand. Changing a single word in verified
 text fails only the words around it.
@@ -24,6 +27,7 @@ site demonstrates the verification side of it.
 |---|---|
 | `index.html`, `verify.js` | The page, and the code that checks and signs in the browser |
 | `pitch.txt` | The pitch |
+| `certificates.json` | Certificates published by the desktop app, checked against their signatures before use |
 | `pitch-certificate.json` | The pitch's certificate, signed with the demo key (ECDSA P-256, SHA-256) |
 
 ## Checking the pitch certificate yourself

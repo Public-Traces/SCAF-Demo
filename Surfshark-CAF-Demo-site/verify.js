@@ -60,6 +60,8 @@ function words(text) {
 
 /* ── what verifies ─────────────────────────────────────────────────────────── */
 const REG = { grams: new Set(), whole: new Set() };
+// The public log: certificates issued by the desktop app on a real Mac, published in certificates.json.
+const LOG = { certs: [], grams: new Map() };
 let PITCH = null, KEY = null;
 
 async function remember(text) {
@@ -90,6 +92,13 @@ async function prepare() {
   const [certRes, pitchRes] = await Promise.all([fetch("pitch-certificate.json", { cache: "no-cache" }), fetch("pitch.txt", { cache: "no-cache" })]);
   const cert = await certRes.json(), text = await pitchRes.text();
   PITCH = { cert, text };
+  let published = [];
+  try { const res = await fetch("certificates.json", { cache: "no-cache" }); if (res.ok) published = await res.json(); } catch (e) {}
+  for (const c of Array.isArray(published) ? published : []) {
+    if (!Array.isArray(c.grams) || !(await verifyCert(c))) continue;   // only certificates whose signature holds
+    LOG.certs.push(c);
+    for (const g of c.grams) LOG.grams.set(g, LOG.certs.length - 1);
+  }
   await Promise.all([...siteCopy(), text].map(remember));
   KEY = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, false, ["sign", "verify"]);
 }
@@ -149,12 +158,20 @@ async function carry(raw, rawMarks) {
   // Version 2 uses only the sixteen common variation selectors, two per byte. They're the ones emoji
   // depend on, so design tools and editors keep them where they may drop rarer invisible characters.
   const hidden = bytes.map(v => String.fromCharCode(0xFE00 + (v >> 4), 0xFE00 + (v & 15))).join("");
-  let i = raw.search(/[\p{L}\p{N}]/u);
-  if (i < 0) i = raw.search(/\S/);
-  const w = String.fromCodePoint(raw.codePointAt(i)).length;
-  return raw.slice(0, i + w) + hidden + raw.slice(i + w);
+  // Written once, straight after the last visible character, so editing the start of the text for
+  // formatting never touches it.
+  const tail = raw.replace(/\s+$/u, "").length;
+  return raw.slice(0, tail) + hidden + raw.slice(tail);
 }
 function readCarried(str) {
+  // Each unbroken run of hidden characters is one copy of the signature; the first complete one wins.
+  for (const run of str.match(/(?:[\uFE00-\uFE0F]|\uDB40[\uDD00-\uDDEF])+/g) || []) {
+    const found = readRun(run);
+    if (found) return found;
+  }
+  return null;
+}
+function readRun(str) {
   const wide = [], nibbles = [];
   for (const ch of str) {
     const cp = ch.codePointAt(0);
@@ -244,6 +261,17 @@ async function analyse(text) {
   grams.forEach((h, i) => { if (REG.grams.has(h)) for (let k = i; k < i + GRAM; k++) { label[k] = "t"; from.add("site"); } });
   if (toks.length && toks.length < GRAM && REG.whole.has(await sha("s|" + toks.map(t => t.w).join(" "))))
     toks.forEach((_, k) => { label[k] = "t"; from.add("site"); });
+  // Text certified on a real Mac: each run of four typed words carries its own fingerprint.
+  const used = new Set(), span = Math.min(GRAM, toks.length);
+  if (span && LOG.grams.size) {
+    const g4 = await Promise.all(toks.slice(0, toks.length - span + 1).map((_, i) =>
+      sha("g4|" + toks.slice(i, i + span).map(t => t.w).join(" ")).then(h => h.slice(0, 32))));
+    g4.forEach((h, i) => {
+      if (!LOG.grams.has(h)) return;
+      for (let k = i; k < i + span; k++) if (label[k] === "u") label[k] = "t";
+      from.add("cert"); used.add(LOG.grams.get(h));
+    });
+  }
   toks.forEach((t, k) => {
     if (label[k] !== "u") return;
     const m = marks.slice(t.s, t.e);
@@ -252,7 +280,7 @@ async function analyse(text) {
       from.add("box");
     }
   });
-  return { toks, label, wordsHash, pitch: false, from };
+  return { toks, label, wordsHash, pitch: false, from, used };
 }
 
 /* Every character takes the verdict of the word it belongs to; punctuation and spaces follow it. */
@@ -330,15 +358,21 @@ async function check() {
     pct = total ? Math.round(good / total * 100) : 0;
     if (pct === 0 && good > 0) pct = 1;
     if (pct === 100 && good < total) pct = 99;
+    if (r.from.size === 1 && r.from.has("cert") && r.used.size === 1) {
+      // Everything that verified came from one real certificate: show that certificate itself.
+      cert = LOG.certs[[...r.used][0]];
+    } else {
     const days = [];
     if (r.from.has("site")) days.push(SITE_WRITTEN);
     if (r.from.has("box")) days.push(localDay(), ...pastedDays);
+    if (r.from.has("cert")) days.push(...[...r.used].map(i => LOG.certs[i].typedFrom).filter(Boolean));
     cert = await signNew({
       v: 1, claim: "demo-signing", issuedAt: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
       originallyTyped: days.sort()[0] || "", percent: pct,
       signedWords: r.label.filter(l => l !== "u").length, words: r.toks.length, wordsHash: r.wordsHash,
       input: "built-in keyboard only", sip: true,
     });
+    }
   }
   CURRENT = cert;
   const valid = await verifyCert(cert);
@@ -371,11 +405,11 @@ async function check() {
     <div><b>${esc(c.t)}</b>${c.d ? `<span class="d">${esc(c.d)}</span>` : ""}</div></li>`).join("");
 
   const keyId = (await sha(unb64(cert.pubKey))).slice(0, 16).match(/.{4}/g).join(" ");
-  const typedOn = r.pitch ? cert.typedFrom : cert.originallyTyped;
+  const typedOn = cert.originallyTyped || cert.typedFrom;
   const rows = [
     ["Originally Typed", typedOn ? longDay(typedOn) : ""],
     ["Certified", certifiedAt(cert.issuedAt)],
-    ["Signed words", String(r.pitch ? cert.words : cert.signedWords)],
+    ["Signed words", String(r.pitch ? cert.words : cert.signedWords ?? r.label.filter(l => l !== "u").length)],
     ["Input accepted", "Built-in keyboard only"],
     ["System protection", "On"],
     ["Signing key", `<code>${keyId}</code>`],
