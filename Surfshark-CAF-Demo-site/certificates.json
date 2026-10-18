@@ -1,1 +1,54 @@
-[]
+[
+ {
+  "words": 22,
+  "sig": "MEUCID8YFAOmbb5WiYLsQU6H+5XrEn5WMAJ2X1IFwWCzS1OKAiEA8iuv0rlAzztznDK4vjUJT6DPNNn1mgfDJO5ht21ldpk=",
+  "v": 1,
+  "externalKeyboard": false,
+  "percent": 99,
+  "editedChars": 0,
+  "claim": "typed-by-a-human",
+  "exactHash": "0f346fe3e41f7295597b4f71d71af56da6440126180e04cf42c7cd698957c76e",
+  "typedChars": 120,
+  "sip": true,
+  "grams": [
+   "a514b5e9f420ccb8e140d2fe6c7340b9",
+   "fbcf3114ad5cf500c01de90df3d66431",
+   "f9187279e4156d5582e65acb95f72f03",
+   "f9d07594b3fb08f4bd976315671fb43e",
+   "eb2d453f8f0a4c303168baee0f3a7443",
+   "867d1adbb7d133314d762a5661f15a20",
+   "0267da6064cc173a7307585d720423f9",
+   "88bec9f23783151465d688120596457a",
+   "1974b2dde46bac5222ea2249b86b043b",
+   "3ee595e69aa82c185308333baaeec5b8",
+   "216b4e1b03f6e6a883ff44403cd24270",
+   "ed64ff79b26ed142f885b0f168dec7f3",
+   "74669f975d786082adc9af0269248ba3",
+   "07d0672a498ce0d7affc962ba2e132ba",
+   "4dda6786fe673350f1d9a3b621ca0316",
+   "0be3e9c488c36c31badeadda0294ffaf",
+   "6103d7d1ce833191080d6f60a50345da",
+   "9f056d2b6007303e19cc177e5609de1e",
+   "6cb067e7ee6ac48852191c7d40cc9cb5"
+  ],
+  "wordsHash": "3deb8ee0f91bb4b7f494f9583fe383b1fbba9033bb0e9c568ba1941e34cb5edb",
+  "passages": [
+   {
+    "n": 12,
+    "h": "f982d0bc5ee70d7fdac1cc05de29abc2",
+    "v": "typed"
+   },
+   {
+    "n": 10,
+    "h": "5555dd27874fae78f321d6a560dfbcf6",
+    "v": "typed"
+   }
+  ],
+  "issuedAt": "2026-10-18T22:59:02Z",
+  "pubKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE3WHos77tyNH8ptWahYqVRLWpHsv2m527dJviAosLYCJ0rEsylz+ibUaeBBiIWlawKhUANoZNegRSbVsuuoa6iA==",
+  "input": "built-in keyboard only",
+  "typedFrom": "2026-10-18",
+  "typedTo": "2026-10-18",
+  "chars": 121
+ }
+]
