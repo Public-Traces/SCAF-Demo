@@ -43,11 +43,18 @@ function rawToDer(raw) {
   return new Uint8Array([0x30, body.length, ...body]);
 }
 
+/* Variation selectors: invisible characters that survive copy and paste, used to carry a signature. */
+const HIDDEN = /[\uFE00-\uFE0F]|\uDB40[\uDD00-\uDDEF]/g;
+const HAS_HIDDEN = /[\uFE00-\uFE0F]|\uDB40[\uDD00-\uDDEF]/;
+
 /* Words the same way the desktop tool splits them: letters, digits and apostrophes, in lower case. */
 function words(text) {
   const out = [], re = /[\p{L}\p{N}\p{M}'’]+/gu;
   let m;
-  while ((m = re.exec(text))) out.push({ w: m[0].normalize("NFC").replace(/’/g, "'").toLowerCase(), s: m.index, e: m.index + m[0].length });
+  while ((m = re.exec(text))) {
+    const w = m[0].replace(HIDDEN, "").normalize("NFC").replace(/’/g, "'").toLowerCase();
+    if (w) out.push({ w, s: m.index, e: m.index + m[0].length });
+  }
   return out;
 }
 
@@ -89,11 +96,16 @@ async function prepare() {
 const ready = prepare();
 
 /* ── typing in the box ─────────────────────────────────────────────────────── */
-// One mark per character of the box: k typed while signing, e typed then replaced by the keyboard's
-// own suggestions while signing, u typed with signing off, p anything else (a paste, a drop, a script).
-let signing = false, marks = [], before = "";
-$("box").addEventListener("input", e => {
-  const now = $("box").value;
+// One mark per character of the box: k typed while signing; e typed then replaced by the keyboard's
+// own suggestions while signing; c pasted in carrying a valid signature; u typed with signing off;
+// p anything else (a paste, a drop, a script).
+let signing = false, marks = [], before = "", pastedDays = [], pending = Promise.resolve();
+const box = $("box");
+const isSigned = m => m.length > 0 && m.every(c => c === "k" || c === "e" || c === "c");
+const isTypedHere = m => m.length > 0 && m.every(c => c === "k" || c === "e");
+
+box.addEventListener("input", e => {
+  let now = box.value;
   let a = 0;
   while (a < before.length && a < now.length && before[a] === now[a]) a++;
   let b = 0;
@@ -101,9 +113,121 @@ $("box").addEventListener("input", e => {
   const typed = ["insertText", "insertCompositionText", "insertLineBreak", "insertParagraph"].includes(e.inputType);
   const mark = !e.isTrusted ? "p" : typed ? (signing ? "k" : "u")
              : e.inputType === "insertReplacementText" ? (signing ? "e" : "u") : "p";
-  marks = marks.slice(0, a).concat(new Array(now.length - a - b).fill(mark), marks.slice(before.length - b));
+  let inserted = now.slice(a, now.length - b), carried = null;
+  if (HAS_HIDDEN.test(inserted)) {
+    // Text pasted back with its signature: keep the signature aside and show only the words.
+    carried = readCarried(inserted);
+    inserted = inserted.replace(HIDDEN, "");
+    now = now.slice(0, a) + inserted + now.slice(now.length - b);
+    box.value = now;
+    box.setSelectionRange(a + inserted.length, a + inserted.length);
+  }
+  marks = marks.slice(0, a).concat(new Array(inserted.length).fill(mark), marks.slice(before.length - b));
   before = now;
+  if (!now) pastedDays = [];
+  if (carried) { const at = a, text = inserted; pending = pending.then(() => acceptCarried(carried, at, text)); }
+  schedulePresign();
 });
+
+/* What this browser has seen typed with demo signing on, kept as fingerprints, the way the desktop
+   tool keeps them on a laptop. Text typed here still verifies after a trip through another app. */
+const MEMORY_KEY = "scaf-demo-typed";
+const MEMORY = new Map();
+try { for (const [h, d] of JSON.parse(localStorage.getItem(MEMORY_KEY) || "[]")) MEMORY.set(h, d); } catch (e) {}
+async function rememberTyped() {
+  const text = box.value, snap = marks.slice(), runs = [];
+  let run = [];
+  for (const t of words(text)) {
+    if (isTypedHere(snap.slice(t.s, t.e))) run.push(t.w);
+    else if (run.length) { runs.push(run); run = []; }
+  }
+  if (run.length) runs.push(run);
+  if (!runs.length) return;
+  const day = localDay();
+  for (const r of runs) {
+    const keys = r.length < GRAM ? ["s|" + r.join(" ")]
+               : r.slice(0, r.length - GRAM + 1).map((_, i) => "g|" + r.slice(i, i + GRAM).join(" "));
+    for (const k of keys) { const h = await sha(k); if (!MEMORY.has(h)) MEMORY.set(h, day); }
+  }
+  try { localStorage.setItem(MEMORY_KEY, JSON.stringify([...MEMORY].slice(-8000))); } catch (e) {}
+}
+
+/* The signature that travels with copied text: which words were signed, when, and by which key,
+   written as invisible characters just after the first visible one. */
+async function carry(raw, rawMarks) {
+  const toks = words(raw);
+  const bits = toks.map(t => isSigned(rawMarks.slice(t.s, t.e)));
+  if (!toks.length || !bits.some(Boolean) || toks.length > 65535) return null;
+  await ready;
+  const day = Math.floor(Date.now() / 86400000);
+  const bitmap = new Uint8Array(Math.ceil(toks.length / 8));
+  bits.forEach((on, i) => { if (on) bitmap[i >> 3] |= 1 << (i & 7); });
+  const msg = enc.encode(`dsig1|${day}|${hex(bitmap)}|${toks.map(t => t.w).join(" ")}`);
+  const sig = new Uint8Array(await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, KEY.privateKey, msg));
+  const pub = new Uint8Array(await crypto.subtle.exportKey("raw", KEY.publicKey));
+  const bytes = [0x53, 0x47, 1, ...pub, day >>> 24 & 255, day >>> 16 & 255, day >>> 8 & 255, day & 255,
+                 toks.length >> 8, toks.length & 255, ...bitmap, ...sig];
+  const hidden = bytes.map(v => String.fromCodePoint(v < 16 ? 0xFE00 + v : 0xE0100 + v - 16)).join("");
+  const i = raw.search(/\S/), w = String.fromCodePoint(raw.codePointAt(i)).length;
+  return raw.slice(0, i + w) + hidden + raw.slice(i + w);
+}
+function readCarried(str) {
+  const bytes = [];
+  for (const ch of str) {
+    const cp = ch.codePointAt(0);
+    if (cp >= 0xFE00 && cp <= 0xFE0F) bytes.push(cp - 0xFE00);
+    else if (cp >= 0xE0100 && cp <= 0xE01EF) bytes.push(cp - 0xE0100 + 16);
+  }
+  if (bytes.length < 138 || bytes[0] !== 0x53 || bytes[1] !== 0x47 || bytes[2] !== 1) return null;
+  const n = bytes[72] << 8 | bytes[73], len = Math.ceil(n / 8);
+  if (bytes.length !== 74 + len + 64) return null;
+  return { pub: new Uint8Array(bytes.slice(3, 68)), day: (bytes[68] << 24 | bytes[69] << 16 | bytes[70] << 8 | bytes[71]) >>> 0,
+           n, bitmap: new Uint8Array(bytes.slice(74, 74 + len)), sig: new Uint8Array(bytes.slice(74 + len)) };
+}
+async function acceptCarried(p, at, text) {
+  const toks = words(text);
+  if (toks.length !== p.n) return;
+  let ok = false;
+  try {
+    const key = await crypto.subtle.importKey("raw", p.pub, { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]);
+    ok = await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, key, p.sig,
+      enc.encode(`dsig1|${p.day}|${hex(p.bitmap)}|${toks.map(t => t.w).join(" ")}`));
+  } catch (e) {}
+  if (!ok || box.value.slice(at, at + text.length) !== text) return;
+  toks.forEach((t, i) => { if (p.bitmap[i >> 3] & 1 << (i & 7)) for (let c = at + t.s; c < at + t.e; c++) marks[c] = "c"; });
+  pastedDays.push(new Date(p.day * 86400000).toISOString().slice(0, 10));
+  schedulePresign();
+}
+
+/* Signing the whole box ahead of time lets select-all and copy carry the signature instantly. */
+let presigned = null, presignTimer = 0;
+function schedulePresign() {
+  clearTimeout(presignTimer);
+  presignTimer = setTimeout(async () => {
+    const value = box.value, text = await carry(value, marks.slice());
+    presigned = text && box.value === value ? { value, text } : null;
+    rememberTyped();
+  }, 120);
+}
+function copyWithSignature(e) {
+  const s = box.selectionStart, t = box.selectionEnd;
+  if (s === t) return;
+  rememberTyped();
+  if (e.type === "copy" && presigned && presigned.value === box.value && s === 0 && t === box.value.length) {
+    e.clipboardData.setData("text/plain", presigned.text);
+    e.preventDefault();
+    return;
+  }
+  // Part of the box: the browser copies the plain words now, and the signed version replaces them.
+  const signed = carry(box.value.slice(s, t), marks.slice(s, t)).then(x => x || box.value.slice(s, t));
+  try {
+    navigator.clipboard.write([new ClipboardItem({ "text/plain": signed.then(x => new Blob([x], { type: "text/plain" })) })]).catch(() => {});
+  } catch (err) {
+    signed.then(x => navigator.clipboard && navigator.clipboard.writeText(x)).catch(() => {});
+  }
+}
+box.addEventListener("copy", copyWithSignature);
+box.addEventListener("cut", copyWithSignature);
 function setSwitch(btn, on) { btn.setAttribute("aria-checked", String(on)); }
 $("signing").addEventListener("click", () => { signing = !signing; setSwitch($("signing"), signing); });
 $("showMarks").addEventListener("click", () => {
@@ -130,15 +254,21 @@ async function analyse(text) {
   grams.forEach((h, i) => { if (REG.grams.has(h)) for (let k = i; k < i + GRAM; k++) { label[k] = "t"; from.add("site"); } });
   if (toks.length && toks.length < GRAM && REG.whole.has(await sha("s|" + toks.map(t => t.w).join(" "))))
     toks.forEach((_, k) => { label[k] = "t"; from.add("site"); });
+  const boxDays = [];
+  grams.forEach((h, i) => { if (MEMORY.has(h)) { for (let k = i; k < i + GRAM; k++) if (label[k] === "u") label[k] = "t"; from.add("box"); boxDays.push(MEMORY.get(h)); } });
+  if (toks.length && toks.length < GRAM) {
+    const h = await sha("s|" + toks.map(t => t.w).join(" "));
+    if (MEMORY.has(h)) { toks.forEach((_, k) => { if (label[k] === "u") label[k] = "t"; }); from.add("box"); boxDays.push(MEMORY.get(h)); }
+  }
   toks.forEach((t, k) => {
     if (label[k] !== "u") return;
     const m = marks.slice(t.s, t.e);
-    if (m.length === t.e - t.s && m.every(c => c === "k" || c === "e")) {
+    if (m.length === t.e - t.s && isSigned(m)) {
       label[k] = m.includes("e") ? "e" : "t";
       from.add("box");
     }
   });
-  return { toks, label, wordsHash, pitch: false, from };
+  return { toks, label, wordsHash, pitch: false, from, boxDays };
 }
 
 /* Every character takes the verdict of the word it belongs to; punctuation and spaces follow it. */
@@ -200,6 +330,8 @@ async function signNew(body) {
 let CURRENT = null;
 async function check() {
   await ready;
+  await pending;
+  rememberTyped();
   const text = $("box").value;
   if (!text.trim()) { $("box").focus(); return; }
   const r = await analyse(text);
@@ -217,7 +349,7 @@ async function check() {
     if (pct === 100 && good < total) pct = 99;
     const days = [];
     if (r.from.has("site")) days.push(SITE_WRITTEN);
-    if (r.from.has("box")) days.push(localDay());
+    if (r.from.has("box")) days.push(localDay(), ...r.boxDays, ...pastedDays);
     cert = await signNew({
       v: 1, claim: "demo-signing", issuedAt: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
       originallyTyped: days.sort()[0] || "", percent: pct,
